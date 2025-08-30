@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>نظام تصاريح دخول الطلاب</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'arabic': ['Cairo', 'Tahoma', 'Arial', 'sans-serif'],
+                        'cairo': ['Cairo', 'Tahoma', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', 'Tahoma', 'Arial', sans-serif;
+        }
+        
+        body {
+            font-family: 'Cairo', 'Tahoma', 'Arial', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #5D5CDE 0%, #4F46E5 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 30px rgba(93, 92, 222, 0.2);
+        }
+        
+        .permission-card {
+            background: #ffffff;
+            border: 3px solid #5D5CDE;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(93, 92, 222, 0.15);
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .permission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #5D5CDE, #4F46E5, #7C3AED, #EC4899);
+        }
+        
+        .permission-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5D5CDE, #4F46E5, #7C3AED);
+            opacity: 0.5;
+        }
+        
+        .stamp {
+            background: radial-gradient(circle, rgba(93, 92, 222, 0.1) 0%, rgba(93, 92, 222, 0.05) 100%);
+            border: 2px dashed #5D5CDE;
+            transform: rotate(-15deg);
+        }
+        
+        .nav-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+        
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 0.5rem;
+                max-width: 100vw;
+            }
+            
+            .container {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                max-width: 100vw !important;
+                width: 100% !important;
+            }
+            
+            .grid-mobile {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            .text-mobile {
+                font-size: 0.9rem !important;
+            }
+            
+            .permission-card {
+                padding: 1rem !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            .nav-tabs {
+                padding: 0.25rem;
+                margin: 0;
+            }
+            
+            .tab-btn {
+                padding: 0.5rem 0.25rem !important;
+                font-size: 0.8rem !important;
+                white-space: nowrap;
+            }
+            
+            /* عناصر النموذج */
+            .bg-white, .bg-gray-800 {
+                padding: 1rem !important;
+                margin: 0 !important;
+            }
+            
+            /* تقليل أحجام العناصر */
+            input, select, button {
+                padding: 0.5rem !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .w-24 {
+                width: 4rem !important;
+            }
+            
+            /* منع التمرير الأفقي */
+            body, html {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+            }
+            
+            * {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            .flex {
+                flex-wrap: wrap !important;
+            }
+            
+            .gap-2 {
+                gap: 0.25rem !important;
+            }
+            
+            .gap-4 {
+                gap: 0.5rem !important;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-desktop {
+                grid-template-columns: 5fr 4fr;
+                gap: 2rem;
+            }
+        }
+        
+        .dark body {
+            background-color: #181818;
+        }
+        
+        .dark .permission-card {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border-color: #5D5CDE;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" sizes="192x192" href="icon-192.png">
+    <link rel="icon" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#4F46E5">
+
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-2 py-4 max-w-full">
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <div class="gradient-bg text-white p-4 rounded-xl card-shadow">
+                <h1 class="text-2xl md:text-3xl font-bold mb-2">نظام تصاريح دخول الطلاب</h1>
+                <p class="text-blue-100 text-sm md:text-base">إدارة وتوثيق حضور الطلاب في الأنشطة المدرسية</p>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs flex mb-6 bg-white dark:bg-gray-800 rounded-lg p-2 card-shadow">
+            <button onclick="switchTab('create')" id="createTab" class="tab-btn flex-1 py-3 px-4 text-center rounded-lg font-medium transition-all bg-blue-500 text-white">
+                <svg class="w-5 h-5 inline-block ml-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                </svg>
+                إنشاء تصريح
+            </button>
+            <button onclick="switchTab('saved')" id="savedTab" class="tab-btn flex-1 py-3 px-4 text-center rounded-lg font-medium transition-all text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg class="w-5 h-5 inline-block ml-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+                </svg>
+                التصاريح المحفوظة
+            </button>
+        </div>
+
+        <!-- Create Permission Tab -->
+        <div id="createContent" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 grid-mobile">
+            <!-- Input Form -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 card-shadow">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">إدخال بيانات التصريح</h2>
+                
+                <form id="permissionForm" class="space-y-4">
+                    <!-- معلومات المعلم -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اسم المعلم المسؤول</label>
+                        <input type="text" id="teacherName" class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" placeholder="أدخل اسم المعلم" required>
+                    </div>
+
+                    <!-- نوع النشاط -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع النشاط</label>
+                        <select id="activityType" class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                            <option value="">اختر نوع النشاط</option>
+                            <option value="تربية بدنية">حصة تربية بدنية</option>
+                            <option value="نشاط رياضي">نشاط رياضي</option>
+                            <option value="رياضيات">حصة رياضيات</option>
+                            <option value="علوم">حصة علوم</option>
+                            <option value="لغة عربية">حصة لغة عربية</option>
+                            <option value="لغة إنجليزية">حصة لغة إنجليزية</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+
+                    <!-- وصف النشاط -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">وصف النشاط</label>
+                        <input type="text" id="activityDescription" class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" placeholder="مثال: تدريب كرة القدم">
+                    </div>
+
+                    <!-- معلومات الوقت -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">تاريخ النشاط</label>
+                            <input type="date" id="activityDate" class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">الحصة</label>
+                            <select id="period" class="w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                                <option value="">اختر الحصة</option>
+                                <option value="الأولى">الحصة الأولى</option>
+                                <option value="الثانية">الحصة الثانية</option>
+                                <option value="الثالثة">الحصة الثالثة</option>
+                                <option value="الرابعة">الحصة الرابعة</option>
+                                <option value="الخامسة">الحصة الخامسة</option>
+                                <option value="السادسة">الحصة السادسة</option>
+                                <option value="السابعة">الحصة السابعة</option>
+                                <option value="الفسحة">الفسحة</option>
+                                <option value="خارج المدرسة">خارج المدرسة</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- رفع الشعار -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">شعار المؤسسة (اختياري)</label>
+                        <div class="flex gap-2">
+                            <input type="file" id="logoInput" accept="image/*" class="flex-1 px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" onchange="handleLogoUpload(event)">
+                            <button type="button" onclick="removeLogo()" class="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors" style="display: none;" id="removeLogoBtn">إزالة</button>
+                        </div>
+                        <div id="logoPreview" class="mt-2 text-center" style="display: none;">
+                            <img id="logoImage" src="" alt="شعار المؤسسة" class="max-w-20 max-h-20 mx-auto rounded-lg border border-gray-300">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">معاينة الشعار</p>
+                        </div>
+                    </div>
+
+                    <!-- رفع الختم -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ختم المؤسسة (اختياري)</label>
+                        <div class="flex gap-2">
+                            <input type="file" id="stampInput" accept="image/*" class="flex-1 px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" onchange="handleStampUpload(event)">
+                            <button type="button" onclick="removeStamp()" class="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors" style="display: none;" id="removeStampBtn">إزالة</button>
+                        </div>
+                        <div id="stampPreview" class="mt-2 text-center" style="display: none;">
+                            <img id="stampImage" src="" alt="ختم المؤسسة" class="max-w-20 max-h-20 mx-auto rounded-lg border border-gray-300">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">معاينة الختم</p>
+                        </div>
+                    </div>
+
+                    <!-- إضافة طالب -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اسم الطالب</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="studentName" class="flex-1 px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" placeholder="أدخل اسم الطالب">
+                            <input type="text" id="studentClass" class="w-24 px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-center" placeholder="الفصل">
+                            <button type="button" onclick="addStudent()" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">إضافة</button>
+                        </div>
+                    </div>
+
+                    <!-- قائمة الطلاب -->
+                    <div id="studentsList" class="space-y-2"></div>
+
+                    <!-- أزرار العمل -->
+                    <div class="flex gap-2 pt-4">
+                        <button type="button" onclick="generatePermissionCard()" class="flex-1 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition-opacity font-medium">إنشاء كرت التصريح</button>
+                        <button type="button" onclick="clearForm()" class="px-4 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm">مسح البيانات</button>
+                        <button type="button" onclick="clearAll()" class="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm">مسح الكل</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Permission Card Preview -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 card-shadow">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 text-center">معاينة كرت التصريح</h2>
+                
+                <div id="permissionCardContainer" class="space-y-4">
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                        <svg class="mx-auto w-16 h-16 mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                        </svg>
+                        <p>أدخل البيانات وأضف الطلاب لإنشاء كرت التصريح</p>
+                    </div>
+                </div>
+                
+                <div id="exportButtons" class="hidden no-print mt-6 space-y-3">
+                    <button onclick="downloadAsImage()" class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium">تحميل كصورة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saved Permissions Tab -->
+    <div id="savedContent" class="tab-content">
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 card-shadow">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">التصاريح المحفوظة</h2>
+                <button onclick="clearAllSaved()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm">
+                    <svg class="w-4 h-4 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 012 0v6a1 1 0 11-2 0V7zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    مسح الكل
+                </button>
+            </div>
+            
+            <div id="savedPermissionsList" class="space-y-4">
+                <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                    <svg class="mx-auto w-16 h-16 mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"/>
+                    </svg>
+                    <p>لا توجد تصاريح محفوظة</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        // IndexedDB setup
+        let db;
+        const DB_NAME = 'PermissionsDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'permissions';
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('date', 'date', { unique: false });
+                        store.createIndex('teacher', 'teacherName', { unique: false });
+                    }
+                };
+            });
+        }
+
+        // Save permission to IndexedDB
+        function savePermission(permissionData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                
+                const permission = {
+                    ...permissionData,
+                    createdAt: new Date().toISOString(),
+                    date: permissionData.activityDate || new Date().toISOString().split('T')[0]
+                };
+                
+                const request = store.add(permission);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Load all permissions from IndexedDB
+        function loadPermissions() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+                
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Delete permission from IndexedDB
+        function deletePermission(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Clear all permissions
+        function clearAllPermissions() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.clear();
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+                btn.classList.add('text-gray-600', 'dark:text-gray-300', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to selected tab
+            document.getElementById(tabName + 'Tab').classList.add('bg-blue-500', 'text-white');
+            document.getElementById(tabName + 'Tab').classList.remove('text-gray-600', 'dark:text-gray-300', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            
+            document.getElementById(tabName + 'Content').classList.add('active');
+            
+            // Load saved permissions if switching to saved tab
+            if (tabName === 'saved') {
+                loadSavedPermissions();
+            }
+        }
+
+        // Load and display saved permissions
+        async function loadSavedPermissions() {
+            try {
+                const permissions = await loadPermissions();
+                const container = document.getElementById('savedPermissionsList');
+                
+                if (permissions.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                            <svg class="mx-auto w-16 h-16 mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"/>
+                            </svg>
+                            <p>لا توجد تصاريح محفوظة</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort by date (newest first)
+                permissions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                container.innerHTML = permissions.map(permission => `
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-1">${permission.teacherName}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">${permission.activityType || 'نشاط غير محدد'}</p>
+                                ${permission.activityDescription ? `<p class="text-sm text-gray-500 dark:text-gray-400">${permission.activityDescription}</p>` : ''}
+                            </div>
+                            <div class="text-center">
+                                <div class="text-sm font-medium text-blue-600 dark:text-blue-400">${new Date(permission.date).toLocaleDateString('ar-SA')}</div>
+                                ${permission.period ? `<div class="text-xs text-gray-500 dark:text-gray-400">${permission.period}</div>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                                <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                                </svg>
+                                ${permission.students.length} طالب
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="loadPermission(${permission.id})" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded transition-colors">
+                                    <svg class="w-4 h-4 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                                    </svg>
+                                    استعادة
+                                </button>
+                                <button onclick="deleteSavedPermission(${permission.id})" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded transition-colors">
+                                    <svg class="w-4 h-4 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 012 0v6a1 1 0 11-2 0V7zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V7a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 pt-3 border-t border-blue-200 dark:border-blue-600">
+                            <div class="flex flex-wrap gap-1">
+                                ${permission.students.map(student => `
+                                    <span class="inline-block bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full">
+                                        ${student.name} (${student.class})
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading permissions:', error);
+                showAlert('حدث خطأ أثناء تحميل التصاريح المحفوظة');
+            }
+        }
+
+        // Load permission data into form
+        async function loadPermission(id) {
+            try {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get(id);
+                
+                request.onsuccess = () => {
+                    const permission = request.result;
+                    if (permission) {
+                        // Switch to create tab
+                        switchTab('create');
+                        
+                        // Fill form with saved data
+                        document.getElementById('teacherName').value = permission.teacherName;
+                        document.getElementById('activityType').value = permission.activityType || '';
+                        document.getElementById('activityDescription').value = permission.activityDescription || '';
+                        document.getElementById('activityDate').value = permission.activityDate || '';
+                        document.getElementById('period').value = permission.period || '';
+                        
+                        // Load students
+                        students = permission.students.map(s => ({
+                            id: Date.now() + Math.random(),
+                            name: s.name,
+                            class: s.class
+                        }));
+                        updateStudentsList();
+                        
+                        showAlert('تم استعادة بيانات التصريح بنجاح');
+                    }
+                };
+                
+                request.onerror = () => {
+                    showAlert('حدث خطأ أثناء استعادة التصريح');
+                };
+                
+            } catch (error) {
+                console.error('Error loading permission:', error);
+                showAlert('حدث خطأ أثناء استعادة التصريح');
+            }
+        }
+
+        // Delete saved permission
+        async function deleteSavedPermission(id) {
+            showConfirmDialog('هل أنت متأكد من حذف هذا التصريح؟', async () => {
+                try {
+                    await deletePermission(id);
+                    loadSavedPermissions();
+                    showAlert('تم حذف التصريح بنجاح');
+                } catch (error) {
+                    console.error('Error deleting permission:', error);
+                    showAlert('حدث خطأ أثناء حذف التصريح');
+                }
+            });
+        }
+
+        // Clear all saved permissions
+        async function clearAllSaved() {
+            showConfirmDialog('هل أنت متأكد من حذف جميع التصاريح المحفوظة؟', async () => {
+                try {
+                    await clearAllPermissions();
+                    loadSavedPermissions();
+                    showAlert('تم حذف جميع التصاريح بنجاح');
+                } catch (error) {
+                    console.error('Error clearing permissions:', error);
+                    showAlert('حدث خطأ أثناء حذف التصاريح');
+                }
+            });
+        }
+
+        // Modified generatePermissionCard function to include save option
+        function generatePermissionCardWithSave() {
+            generatePermissionCard();
+            
+            // Add save button if permission card was generated successfully
+            const exportButtons = document.getElementById('exportButtons');
+            if (!exportButtons.classList.contains('hidden')) {
+                // Check if save button already exists
+                if (!document.getElementById('saveButton')) {
+                    const saveButton = document.createElement('button');
+                    saveButton.id = 'saveButton';
+                    saveButton.className = 'w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium';
+                    saveButton.onclick = saveCurrentPermission;
+                    saveButton.innerHTML = `
+                        <svg class="w-5 h-5 inline-block ml-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        حفظ التصريح
+                    `;
+                    exportButtons.appendChild(saveButton);
+                }
+            }
+        }
+
+        // Save current permission
+        async function saveCurrentPermission() {
+            try {
+                const permissionData = {
+                    teacherName: document.getElementById('teacherName').value.trim(),
+                    activityType: document.getElementById('activityType').value,
+                    activityDescription: document.getElementById('activityDescription').value.trim(),
+                    activityDate: document.getElementById('activityDate').value,
+                    period: document.getElementById('period').value,
+                    students: students
+                };
+                
+                await savePermission(permissionData);
+                showAlert('تم حفظ التصريح بنجاح!');
+            } catch (error) {
+                console.error('Error saving permission:', error);
+                showAlert('حدث خطأ أثناء حفظ التصريح');
+            }
+        }
+        // إعداد الوضع الداكن
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        let students = [];
+        let logoDataUrl = null;
+        let stampDataUrl = null;
+
+        // تحديد التاريخ الحالي
+        document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
+
+        // دوال معالجة الشعار
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // فحص نوع الملف
+            if (!file.type.startsWith('image/')) {
+                showAlert('يرجى اختيار ملف صورة صالح');
+                return;
+            }
+
+            // فحص حجم الملف (حد أقصى 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                logoDataUrl = e.target.result;
+                
+                // عرض معاينة الشعار
+                const logoImage = document.getElementById('logoImage');
+                const logoPreview = document.getElementById('logoPreview');
+                const removeBtn = document.getElementById('removeLogoBtn');
+                
+                logoImage.src = logoDataUrl;
+                logoPreview.style.display = 'block';
+                removeBtn.style.display = 'inline-block';
+                
+                showAlert('تم رفع الشعار بنجاح!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeLogo() {
+            logoDataUrl = null;
+            document.getElementById('logoInput').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('removeLogoBtn').style.display = 'none';
+            showAlert('تم إزالة الشعار');
+        }
+
+        // دوال معالجة الختم
+        function handleStampUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // فحص نوع الملف
+            if (!file.type.startsWith('image/')) {
+                showAlert('يرجى اختيار ملف صورة صالح');
+                return;
+            }
+
+            // فحص حجم الملف (حد أقصى 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('حجم الصورة كبير جداً. يرجى اختيار صورة أصغر من 5 ميجابايت');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                stampDataUrl = e.target.result;
+                
+                // عرض معاينة الختم
+                const stampImage = document.getElementById('stampImage');
+                const stampPreview = document.getElementById('stampPreview');
+                const removeBtn = document.getElementById('removeStampBtn');
+                
+                stampImage.src = stampDataUrl;
+                stampPreview.style.display = 'block';
+                removeBtn.style.display = 'inline-block';
+                
+                showAlert('تم رفع الختم بنجاح!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeStamp() {
+            stampDataUrl = null;
+            document.getElementById('stampInput').value = '';
+            document.getElementById('stampPreview').style.display = 'none';
+            document.getElementById('removeStampBtn').style.display = 'none';
+            showAlert('تم إزالة الختم');
+        }
+
+        function addStudent() {
+            const nameInput = document.getElementById('studentName');
+            const classInput = document.getElementById('studentClass');
+            
+            const name = nameInput.value.trim();
+            const studentClass = classInput.value.trim();
+            
+            if (!name) {
+                showAlert('يرجى إدخال اسم الطالب');
+                return;
+            }
+            
+            const student = {
+                id: Date.now(),
+                name: name,
+                class: studentClass || 'غير محدد'
+            };
+            
+            students.push(student);
+            updateStudentsList();
+            
+            // مسح الحقول
+            nameInput.value = '';
+            classInput.value = '';
+            nameInput.focus();
+        }
+
+        function removeStudent(id) {
+            students = students.filter(student => student.id !== id);
+            updateStudentsList();
+        }
+
+        function updateStudentsList() {
+            const container = document.getElementById('studentsList');
+            
+            if (students.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                    <h4 class="font-medium text-blue-800 dark:text-blue-200 mb-3">الطلاب المضافون (${students.length})</h4>
+                    <div class="space-y-2">
+                        ${students.map(student => `
+                            <div class="flex items-center justify-between bg-white dark:bg-gray-700 p-3 rounded-lg border">
+                                <div>
+                                    <span class="font-medium text-gray-800 dark:text-white">${student.name}</span>
+                                    <span class="text-sm text-gray-600 dark:text-gray-300 mr-2">- ${student.class}</span>
+                                </div>
+                                <button onclick="removeStudent(${student.id})" class="text-red-500 hover:text-red-700 transition-colors">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generatePermissionCard() {
+            const teacherName = document.getElementById('teacherName').value.trim();
+            const activityType = document.getElementById('activityType').value;
+            const activityDescription = document.getElementById('activityDescription').value.trim();
+            const activityDate = document.getElementById('activityDate').value;
+            const period = document.getElementById('period').value;
+            
+            if (!teacherName) {
+                showAlert('يرجى إدخال اسم المعلم');
+                return;
+            }
+            
+            if (students.length === 0) {
+                showAlert('يرجى إضافة طالب واحد على الأقل');
+                return;
+            }
+            
+            const formattedDate = activityDate ? new Date(activityDate).toLocaleDateString('ar-SA') : new Date().toLocaleDateString('ar-SA');
+            const currentTime = new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+            
+            const cardHtml = `
+                <div id="permissionCard" class="permission-card p-6 rounded-2xl mx-auto" style="max-width: 650px; width: 100%; box-sizing: border-box;">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        ${logoDataUrl ? `
+                        <div class="flex items-center justify-center mb-3">
+                            <img src="${logoDataUrl}" alt="شعار المؤسسة" class="w-16 h-16 object-contain rounded-lg border border-gray-200 shadow-lg">
+                        </div>
+                        ` : `
+                        <div class="w-16 h-16 mx-auto mb-3 gradient-bg rounded-full flex items-center justify-center shadow-lg">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        `}
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2 px-4 text-center leading-relaxed">تصريح دخول طلاب</h2>
+                        <div class="h-1.5 w-24 gradient-bg mx-auto rounded-full shadow-sm"></div>
+                        <p class="text-xs text-gray-600 dark:text-gray-300 mt-2 font-medium">وثيقة رسمية معتمدة</p>
+                    </div>
+                    
+                    <!-- معلومات أساسية في صفين -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <!-- الصف الأول: التاريخ والوقت والمعلم -->
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 p-3 rounded-lg border border-blue-200 dark:border-blue-700">
+                            <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+                                <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm">
+                                    <svg class="w-4 h-4 text-blue-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div>
+                                        <span class="text-gray-500 dark:text-gray-400 text-xs block">التاريخ</span>
+                                        <span class="font-bold text-gray-800 dark:text-white text-xs">${formattedDate}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm">
+                                    <svg class="w-4 h-4 text-green-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div>
+                                        <span class="text-gray-500 dark:text-gray-400 text-xs block">الوقت</span>
+                                        <span class="font-bold text-gray-800 dark:text-white text-xs">${currentTime}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            ${period ? `
+                            <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm">
+                                <svg class="w-4 h-4 text-purple-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400 text-xs block">الحصة الدراسية</span>
+                                    <span class="font-bold text-gray-800 dark:text-white text-xs">${period}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- الصف الثاني: معلومات المعلم والنشاط -->
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 p-3 rounded-lg border border-green-200 dark:border-green-700">
+                            <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm mb-2">
+                                <svg class="w-5 h-5 text-green-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400 text-xs block">المعلم المسؤول</span>
+                                    <span class="font-bold text-sm text-blue-600 dark:text-blue-400">${teacherName}</span>
+                                </div>
+                            </div>
+                            ${activityType ? `
+                            <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm ${activityDescription ? 'mb-2' : ''}">
+                                <svg class="w-4 h-4 text-orange-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400 text-xs block">نوع النشاط</span>
+                                    <span class="font-bold text-gray-800 dark:text-white text-xs">${activityType}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${activityDescription ? `
+                            <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm">
+                                <svg class="w-4 h-4 text-indigo-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400 text-xs block">وصف النشاط</span>
+                                    <span class="font-bold text-gray-800 dark:text-white text-xs">${activityDescription}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- قائمة الطلاب - أكثر إحتواءً -->
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 p-4 rounded-lg mb-4 border border-yellow-200 dark:border-yellow-700">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-yellow-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                                </svg>
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-white">الطلاب المصرح لهم بالدخول</h3>
+                            </div>
+                            <div class="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-bold">
+                                ${students.length} طالب
+                            </div>
+                        </div>
+                        <div class="grid ${students.length > 6 ? 'grid-cols-2' : 'grid-cols-1'} gap-2" style="width: 100%; overflow: hidden;">
+                            ${students.map((student, index) => `
+                                <div class="flex items-center bg-white dark:bg-gray-700 p-2 rounded shadow-sm border-r-2 border-blue-500" style="min-width: 0; word-wrap: break-word;">
+                                    <span class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold ml-2 flex-shrink-0">${index + 1}</span>
+                                    <span class="font-bold text-gray-800 dark:text-white text-sm flex-1" style="word-break: break-word; overflow-wrap: break-word;">${student.name}</span>
+                                    <span class="text-xs text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded font-medium flex-shrink-0">${student.class}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- التوقيع والختم والتنبيه -->
+                    <div class="flex justify-between items-end">
+                        <div class="text-center bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                            <div class="w-24 h-0.5 bg-gray-400 dark:bg-gray-500 mb-1"></div>
+                            <div class="text-xs font-medium text-gray-600 dark:text-gray-300">توقيع المعلم المسؤول</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${teacherName}</div>
+                        </div>
+                        
+                        <!-- الختم في الوسط -->
+                        <div class="flex items-center justify-center">
+                            ${stampDataUrl ? `
+                            <img src="${stampDataUrl}" alt="ختم المؤسسة" class="w-20 h-20 object-contain rounded-lg shadow-lg transform -rotate-12 opacity-90">
+                            ` : `
+                            <div class="stamp px-4 py-3 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/50 dark:to-pink-900/50 border-2 border-dashed border-purple-400 dark:border-purple-500">
+                                <div class="text-center">
+                                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400 mx-auto mb-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div class="text-xs font-bold text-purple-600 dark:text-purple-400">مُعتمد رسمياً</div>
+                                    <div class="text-xs text-purple-500 dark:text-purple-300 mt-1">${formattedDate}</div>
+                                </div>
+                            </div>
+                            `}
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/30 dark:to-orange-900/30 p-3 rounded-lg border border-red-200 dark:border-red-700">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-red-500 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <p class="text-xs font-bold text-red-600 dark:text-red-400">تنبيه هام</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">صالح لليوم المحدد فقط</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('permissionCardContainer').innerHTML = cardHtml;
+            document.getElementById('exportButtons').classList.remove('hidden');
+            
+            // Add save button
+            const exportButtons = document.getElementById('exportButtons');
+            if (!document.getElementById('saveButton')) {
+                const saveButton = document.createElement('button');
+                saveButton.id = 'saveButton';
+                saveButton.className = 'w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium';
+                saveButton.onclick = saveCurrentPermission;
+                saveButton.innerHTML = `
+                    <svg class="w-5 h-5 inline-block ml-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    حفظ التصريح
+                `;
+                exportButtons.appendChild(saveButton);
+            }
+        }
+
+        function downloadAsImage() {
+            const card = document.getElementById('permissionCard');
+            if (!card) {
+                showAlert('يرجى إنشاء كرت التصريح أولاً');
+                return;
+            }
+            
+            // عرض رسالة التحميل
+            const loadingAlert = document.createElement('div');
+            loadingAlert.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            loadingAlert.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center">
+                        <svg class="animate-spin w-6 h-6 text-blue-500 ml-3" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-gray-700 dark:text-gray-300">جاري إنشاء الصورة...</span>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loadingAlert);
+            
+            // تأخير قصير للسماح بعرض رسالة التحميل
+            setTimeout(() => {
+                // إنشاء نسخة للتصدير مع تحسينات
+                const exportCard = card.cloneNode(true);
+                
+                // تطبيق أنماط محددة للتصدير
+                exportCard.style.cssText = `
+                    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+                    color: #000000 !important;
+                    font-family: 'Cairo', 'Tahoma', 'Arial', sans-serif !important;
+                    width: 600px !important;
+                    max-width: 600px !important;
+                    box-sizing: border-box !important;
+                    padding: 40px !important;
+                    border: 3px solid #5D5CDE !important;
+                    border-radius: 16px !important;
+                    position: relative !important;
+                    overflow: visible !important;
+                `;
+                
+                // تطبيق أنماط على العناصر الفرعية
+                const allElements = exportCard.querySelectorAll('*');
+                allElements.forEach(el => {
+                    const computedStyle = window.getComputedStyle(el);
+                    el.style.color = el.style.color || computedStyle.color;
+                    if (el.classList.contains('dark:text-white') || el.classList.contains('text-gray-800')) {
+                        el.style.color = '#000000';
+                    }
+                    if (el.classList.contains('dark:text-gray-300') || el.classList.contains('text-gray-600')) {
+                        el.style.color = '#4B5563';
+                    }
+                    if (el.classList.contains('dark:bg-gray-700') || el.classList.contains('bg-white')) {
+                        el.style.backgroundColor = '#ffffff';
+                    }
+                });
+                
+                // إنشاء حاوية مؤقتة مع خلفية بيضاء
+                const tempContainer = document.createElement('div');
+                tempContainer.style.cssText = `
+                    position: absolute;
+                    left: -9999px;
+                    top: 0;
+                    background-color: white;
+                    padding: 20px;
+                    width: 640px;
+                    font-family: 'Cairo', 'Tahoma', 'Arial', sans-serif;
+                `;
+                tempContainer.appendChild(exportCard);
+                document.body.appendChild(tempContainer);
+                
+                // تصدير بواسطة html2canvas
+                html2canvas(exportCard, {
+                    backgroundColor: '#ffffff',
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    width: 600,
+                    height: exportCard.scrollHeight,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: 640,
+                    windowHeight: exportCard.scrollHeight + 100
+                }).then(canvas => {
+                    // إنشاء رابط التحميل
+                    const link = document.createElement('a');
+                    const fileName = `تصريح_دخول_${new Date().toISOString().split('T')[0]}.png`;
+                    link.download = fileName;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    
+                    // تحميل الملف
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // تنظيف العناصر المؤقتة
+                    document.body.removeChild(tempContainer);
+                    document.body.removeChild(loadingAlert);
+                    
+                    // عرض رسالة نجاح
+                    showAlert('تم تحميل كرت التصريح بنجاح!');
+                    
+                }).catch(error => {
+                    console.error('خطأ في تصدير الصورة:', error);
+                    document.body.removeChild(tempContainer);
+                    document.body.removeChild(loadingAlert);
+                    showAlert('حدث خطأ أثناء تصدير الصورة. يرجى المحاولة مرة أخرى.');
+                });
+            }, 100);
+        }
+
+        function printCard() {
+            const card = document.getElementById('permissionCard');
+            if (!card) {
+                showAlert('يرجى إنشاء كرت التصريح أولاً');
+                return;
+            }
+            
+            window.print();
+        }
+
+        function clearForm() {
+            showConfirmDialog('هل أنت متأكد من مسح بيانات النموذج؟ (سيتم الاحتفاظ بالشعارات والأختام)', () => {
+                // مسح النموذج مع الاحتفاظ بالشعارات والأختام
+                document.getElementById('teacherName').value = '';
+                document.getElementById('activityType').value = '';
+                document.getElementById('activityDescription').value = '';
+                document.getElementById('period').value = '';
+                
+                students = [];
+                updateStudentsList();
+                document.getElementById('permissionCardContainer').innerHTML = `
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                        <svg class="mx-auto w-16 h-16 mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                        </svg>
+                        <p>أدخل البيانات وأضف الطلاب لإنشاء كرت التصريح</p>
+                    </div>
+                `;
+                document.getElementById('exportButtons').classList.add('hidden');
+                document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
+            });
+        }
+
+        function clearAll() {
+            showConfirmDialog('هل أنت متأكد من مسح جميع البيانات؟ (سيتم الاحتفاظ بالشعارات والأختام)', () => {
+                // مسح النموذج بالكامل مع الاحتفاظ بالشعارات والأختام
+                document.getElementById('teacherName').value = '';
+                document.getElementById('activityType').value = '';
+                document.getElementById('activityDescription').value = '';
+                document.getElementById('period').value = '';
+                
+                students = [];
+                updateStudentsList();
+                
+                document.getElementById('permissionCardContainer').innerHTML = `
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                        <svg class="mx-auto w-16 h-16 mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                        </svg>
+                        <p>أدخل البيانات وأضف الطلاب لإنشاء كرت التصريح</p>
+                    </div>
+                `;
+                document.getElementById('exportButtons').classList.add('hidden');
+                document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
+                
+                showAlert('تم مسح جميع البيانات بنجاح (تم الاحتفاظ بالشعارات)');
+            });
+        }
+
+        // إضافة الطالب بالضغط على Enter
+        document.getElementById('studentName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addStudent();
+            }
+        });
+        
+        document.getElementById('studentClass').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addStudent();
+            }
+        });
+
+        // دوال المودال المخصص
+        function showAlert(message) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-6 h-6 text-blue-500 ml-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">تنبيه</h3>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">${message}</p>
+                    <div class="flex justify-end">
+                        <button class="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 rounded transition-colors">موافق</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // إضافة مستمع الحدث للزر
+            const button = modal.querySelector('button');
+            button.addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // إضافة مستمع للنقر خارج المودال
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        function showConfirmDialog(message, onConfirm) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-6 h-6 text-orange-500 ml-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">تأكيد</h3>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">${message}</p>
+                    <div class="flex justify-end space-x-3">
+                        <button class="cancel-btn px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors ml-3">إلغاء</button>
+                        <button class="confirm-btn px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded transition-colors">تأكيد</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // إضافة مستمعي الأحداث للأزرار
+            const cancelBtn = modal.querySelector('.cancel-btn');
+            const confirmBtn = modal.querySelector('.confirm-btn');
+            
+            cancelBtn.addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            confirmBtn.addEventListener('click', function() {
+                document.body.removeChild(modal);
+                if (typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+            
+            // إضافة مستمع للنقر خارج المودال
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        // منع تحديث الصفحة نهائياً
+        function preventPageRefresh() {
+            // منع تحديث الصفحة بأزرار لوحة المفاتيح
+            document.addEventListener('keydown', function(e) {
+                // منع F5
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                
+                // منع Ctrl+R (Windows/Linux) و Cmd+R (Mac)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                
+                // منع Ctrl+F5 (hard refresh)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'F5') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                
+                // منع Ctrl+Shift+R (hard refresh)
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, true);
+            
+            // منع تحديث الصفحة عبر النقر بالزر الأيمن وإعادة التحميل
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // منع سحب الصفحة لأسفل للتحديث (pull-to-refresh)
+            let startY = 0;
+            let isAtTop = false;
+            
+            document.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].pageY;
+                isAtTop = window.scrollY === 0;
+            }, { passive: false });
+            
+            document.addEventListener('touchmove', function(e) {
+                const currentY = e.touches[0].pageY;
+                const deltaY = currentY - startY;
+                
+                // إذا كان المستخدم في أعلى الصفحة ويسحب لأسفل
+                if (isAtTop && deltaY > 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { passive: false });
+            
+            // منع إعادة تحميل الصفحة عبر window events
+            window.addEventListener('beforeunload', function(e) {
+                // عرض تحذير عند محاولة إغلاق الصفحة
+                e.preventDefault();
+                e.returnValue = 'هل أنت متأكد من مغادرة الصفحة؟ قد تفقد البيانات المدخلة.';
+                return e.returnValue;
+            });
+            
+            // منع navigation events
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('beforeunload', function(e) {
+                    e.preventDefault();
+                });
+            }
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                console.log('IndexedDB initialized successfully');
+                
+                // تفعيل منع تحديث الصفحة
+                preventPageRefresh();
+                console.log('Page refresh prevention activated');
+                
+            } catch (error) {
+                console.error('Failed to initialize IndexedDB:', error);
+                showAlert('تعذر تهيئة قاعدة البيانات المحلية. قد لا تعمل ميزة حفظ التصاريح بشكل صحيح.');
+            }
+        });
+    </script>
+
+    <script>
+    (function(){
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('./sw.js').then(function(reg){
+            // console.log('SW registered', reg);
+          }).catch(function(err){
+            console.warn('SW registration failed:', err);
+          });
+        });
+      }
+    })();
+    </script>
+
+</body>
+</html>
